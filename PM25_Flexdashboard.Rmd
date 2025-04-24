@@ -1,0 +1,100 @@
+---
+title: "PM2.5 Pollution Dashboard"
+author: "Rashaad Glenn"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(tidyverse)
+library(DT)
+library(plotly)
+avgpm25 <- read_csv("avgpm25.csv")
+```
+
+PM25 {.tabset}
+-----------------------------------------------------------------------
+
+Overview
+===
+
+PM2.5 refers to fine particulate matter that is 2.5 micrometers or smaller in diameter—so tiny that it’s about 1/30th the width of a human hair. These microscopic particles are suspended in the air and can come from a variety of sources, including vehicle exhaust, industrial emissions, wildfires, power plants, and even indoor activities like cooking or burning candles. PM2.5 is especially concerning because of its ability to penetrate deep into the lungs and even enter the bloodstream, making it a serious health risk. Long-term exposure to PM2.5 has been linked to respiratory and cardiovascular problems, aggravated asthma, and increased risk of heart attacks and strokes. It can be particularly harmful to vulnerable groups such as children, the elderly, and people with preexisting health conditions. Because of its widespread presence and potential health impacts, PM2.5 is one of the key pollutants monitored in air quality studies and public health advisories.
+
+PM2.5 Summary Stats 
+===
+
+Column {.tabsetdata-width=450}
+---
+### Summary
+Below is the calculated mean and median from the statistics of the Particulate matter study. In the final row the number of counties that have levels that are considered high, which is a very important stat in the study.  
+```{r}
+# Value boxes showing summary statistics
+high_pm25 <- avgpm25 %>% filter(pm25 > 15) %>% nrow()
+mean_pm25 <- mean(avgpm25$pm25, na.rm = TRUE)
+median_pm25 <- median(avgpm25$pm25, na.rm = TRUE)
+```
+```{r}
+mean_pm25
+```
+ 
+On average, the pm25 level recorded across all counties in the united states is about 10. This is a good average is the goal is to keep PM25 levels under 12. 
+
+```{r}
+median_pm25
+```
+Of all the values of PM25, 10.03482 is the value that is in the very middle of all the data. 
+
+```{r}
+high_pm25
+```
+The number above displays the amount of counties in the US that have a PM25 level that is considered hight which is a value over 15
+
+
+
+Regional Comparison
+===
+Column {.tabset data-width=550}
+--- 
+### PM2.5 by Region (Boxplot)
+
+```{r}
+ggplot(avgpm25, aes(x = pm25, y = region, color = region)) +
+  geom_boxplot() +
+  labs(title = "PM2.5 by Region", x = "Fine Particle Pollution Level", y = "Region")
+```
+
+### PM2.5 by Region (Violin Plot)
+
+```{r}
+ggplot(avgpm25, aes(x = pm25, y = region, color = region)) +
+  geom_violin() +
+  labs(title = "PM2.5 by Region (Violin Plot)", x = "Fine Particle Pollution Level", y = "Region")
+```
+
+Column {data-width=450}
+---
+Analysis
+
+The plots of PM2.5 data gives a visual summary of the distribution, central tendency, and variability of the PM2.5 concentrations. The violin plot varies in width based on frequency so its slghtly easier to visualize variation but both plots say the same things. 
+
+
+High PM2.5 Counties
+===
+
+Column {data-width=550}
+---
+
+### Table of all high PM2.5 counties 
+```{r}
+avgpm25 %>% filter(pm25 > 15)
+```
+
+
+Column {data-width=450}
+---
+### Analysis 
+As seen, all of the counties that have high PM2.5 levels lie in the western part of the country. All have similar coordinates as well. So it may be safe to assume that many of the counties are in the same state. 
+
